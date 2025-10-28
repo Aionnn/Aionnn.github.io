@@ -376,6 +376,8 @@
         const SPAWN_INTERVAL = 2000;
         let lastSpawnTime = 0;
         let confetti = [];
+        let heartsDestroyed = 0;
+        const HEARTS_TO_WIN = 18;
 
         const romanticMessages = [
             "Eres mi razón de sonreír cada día ✨",
@@ -816,9 +818,19 @@
                     createExplosion(hearts[i].x, hearts[i].y);
                     createConfetti(hearts[i].x, hearts[i].y);
                     hearts.splice(i, 1);
+                    
+                    heartsDestroyed++;
 
-                    const message = getUniqueMessage();
-                    showMessage(message);
+                    // Mostrar mensaje romántico o contador
+                    if (heartsDestroyed < HEARTS_TO_WIN) {
+                        const message = getUniqueMessage();
+                        showMessage(message);
+                        
+                        // Mostrar contador después de 2 segundos
+                        setTimeout(() => {
+                            updateCounter();
+                        }, 2000);
+                    }
 
                     // Sonido de impacto mejorado
                     try {
@@ -847,7 +859,8 @@
                         canvas.style.transform = 'scale(1)';
                     }, 100);
 
-                    if (hearts.length === 0) {
+                    // Verificar si alcanzó los 18 corazones
+                    if (heartsDestroyed >= HEARTS_TO_WIN) {
                         setTimeout(() => {
                             showVictory();
                         }, 500);
@@ -872,7 +885,10 @@
 
         // Iniciar con algunos corazones
         spawnHeart();
-        showMessage("Caumsa, Dispara a los corazones");
+        showMessage("🎯 Dispara a 18 corazones para ver el mensaje final");
+        setTimeout(() => {
+            updateCounter();
+        }, 3000);
         animate(0);
     </script>
 </body>

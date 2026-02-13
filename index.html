@@ -818,8 +818,8 @@
         }
 
         // Reproducir música automáticamente
-        const music = document.getElementById('backgroundMusic');
         document.addEventListener('DOMContentLoaded', () => {
+            const music = document.getElementById('backgroundMusic');
             music.play().catch(e => {
                 // Si falla el autoplay, intentar reproducir al primer click
                 document.body.addEventListener('click', () => {

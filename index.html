@@ -4,8 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dra.Rata 🐭</title>
+    <title>Consulta Clínica Especial - 14 de Febrero</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=DM+Serif+Display&display=swap"
+        rel="stylesheet">
     <style>
+        :root {
+            --bg-dark: #0a0e14;
+            --bg-card: #161b22;
+            --border-color: #2d333b;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-pink: #ff7b9c;
+            --accent-green: #56d364;
+            --heartbeat-color: #ff6b9d;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,413 +28,798 @@
         }
 
         body {
-            font-family: 'Georgia', serif;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #ffecd2 100%);
+            font-family: 'IBM Plex Mono', monospace;
+            background: var(--bg-dark);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
-            padding: 40px 20px;
+            align-items: center;
+            padding: 20px;
             position: relative;
             overflow-x: hidden;
         }
 
-        h1 {
-            color: #fff;
-            margin-bottom: 15px;
-            text-align: center;
-            font-size: 3em;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
-            font-weight: normal;
-            letter-spacing: 3px;
-        }
 
-        .subtitle {
-            color: #fff;
-            text-align: center;
-            font-size: 1.2em;
-            margin-bottom: 50px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-            font-style: italic;
-        }
-
-        .container {
-            position: relative;
-            max-width: 1400px;
-            width: 100%;
-            height: 800px;
-        }
-
-        .envelope-container {
-            position: absolute;
-            perspective: 1000px;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .envelope-container:hover {
-            transform: translateY(-10px) scale(1.05);
-            z-index: 100;
-        }
-
-        .envelope-wrapper {
-            width: 200px;
-            height: 130px;
-            margin: 0 auto;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: all 0.5s ease;
-        }
-
-        .envelope-front {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
-            border: 3px solid #e17055;
-            border-radius: 10px;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3em;
-        }
-
-        .envelope-top {
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-left: 100px solid transparent;
-            border-right: 100px solid transparent;
-            border-bottom: 65px solid #e17055;
-            top: 0;
-            left: 0;
-            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
-            transform-origin: top center;
-            transition: transform 0.5s ease;
-            z-index: 10;
-        }
-
-        .envelope-container.opened .envelope-top {
-            transform: rotateX(180deg);
-        }
-
-        .modal {
-            display: none;
+        body::before {
+            content: '';
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s ease;
-            padding: 20px;
+            background-image:
+                linear-gradient(rgba(88, 166, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(88, 166, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
         }
 
-        .modal.active {
-            display: flex;
+        @keyframes gridMove {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(50px, 50px);
+            }
+        }
+
+        .ecg-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .ecg-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 200%;
+            height: 120px;
+            transform: translateY(-50%);
+            animation: ecgScroll 6s linear infinite;
+        }
+
+        .ecg-line svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .ecg-path {
+            fill: none;
+            stroke: var(--heartbeat-color);
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 10px rgba(255, 107, 157, 1));
+            opacity: 0.5;
+        }
+
+        .ecg-line:nth-child(1) {
+            top: 30%;
+            opacity: 0.4;
+            animation-duration: 7s;
+        }
+
+        .ecg-line:nth-child(2) {
+            top: 50%;
+            opacity: 0.6;
+        }
+
+        .ecg-line:nth-child(3) {
+            top: 70%;
+            opacity: 0.4;
+            animation-duration: 8s;
+        }
+
+        @keyframes ecgScroll {
+            0% {
+                transform: translateY(-50%) translateX(0);
+            }
+
+            100% {
+                transform: translateY(-50%) translateX(-50%);
+            }
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(255, 107, 157, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 107, 157, 0.08) 1px, transparent 1px),
+                linear-gradient(rgba(255, 107, 157, 0.18) 1.5px, transparent 1.5px),
+                linear-gradient(90deg, rgba(255, 107, 157, 0.18) 1.5px, transparent 1.5px);
+            background-size: 25px 25px, 25px 25px, 100px 100px, 100px 100px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #6c4675, var(--accent-pink));
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .screen.active {
+            display: block;
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
+                transform: translateY(10px);
             }
 
             to {
                 opacity: 1;
-            }
-        }
-
-        .letter-sheet {
-            background: linear-gradient(to bottom, #fff, #fffbf0);
-            width: 100%;
-            max-width: 600px;
-            max-height: 85vh;
-            border-radius: 15px;
-            padding: 50px 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            position: relative;
-            overflow-y: auto;
-            animation: slideUp 0.5s ease;
-            border: 3px solid #ffd700;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(100px);
-                opacity: 0;
-            }
-
-            to {
                 transform: translateY(0);
-                opacity: 1;
             }
         }
 
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 40px;
-            height: 40px;
-            background: #e17055;
-            border: none;
-            border-radius: 50%;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .close-btn:hover {
-            background: #d63031;
-            transform: rotate(90deg);
-        }
-
-        .letter-header {
+        .header {
             text-align: center;
             margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px dashed #e17055;
         }
 
-        .letter-header h2 {
-            color: #d63031;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .letter-header .date {
-            color: #666;
-            font-style: italic;
-            font-size: 1em;
-        }
-
-        .letter-body {
-            color: #333;
-            line-height: 1.8;
-            font-size: 1.15em;
-            text-align: justify;
-            margin-bottom: 30px;
-        }
-
-        .letter-body p {
+        .badge {
+            display: inline-block;
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid #6c4675;
+            color: #863d97;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
             margin-bottom: 20px;
         }
 
-        .letter-footer {
-            text-align: center;
-            padding-top: 20px;
-            border-top: 2px dashed #e17055;
+        h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 32px;
+            font-weight: 400;
+            margin-bottom: 12px;
+            line-height: 1.2;
         }
 
-        .letter-footer .signature {
-            font-size: 2em;
-            color: #d63031;
-            margin-top: 10px;
+        h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 26px;
+            font-weight: 400;
+            margin-bottom: 20px;
+            color: var(--accent-pink);
         }
 
-        .decorative-hearts {
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .info-section {
+            background: rgba(88, 166, 255, 0.05);
+            border-left: 3px solid #6c4675;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 6px;
+        }
+
+        .info-row {
             display: flex;
-            justify-content: center;
-            gap: 15px;
-            font-size: 1.5em;
-            margin: 20px 0;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
         }
 
-        @media (max-width: 768px) {
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            color: var(--text-primary);
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .patient-name {
+            color: var(--accent-pink);
+            font-weight: 600;
+        }
+
+
+        .heartbeat-monitor {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0;
+            height: 60px;
+            position: relative;
+        }
+
+        .heart-icon {
+            font-size: 40px;
+            color: var(--heartbeat-color);
+            animation: heartbeat 1.5s ease-in-out infinite;
+            filter: drop-shadow(0 0 8px rgba(255, 107, 157, 0.4));
+        }
+
+        @keyframes heartbeat {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            10% {
+                transform: scale(1.1);
+            }
+
+            20% {
+                transform: scale(1);
+            }
+
+            30% {
+                transform: scale(1.1);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+        }
+
+
+        .question-container {
+            margin: 30px 0;
+        }
+
+        .question {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .question-number {
+            color: #6c4675;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: rgba(88, 166, 255, 0.08);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 16px 20px;
+            border-radius: 10px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .option-btn:hover {
+            background: rgba(88, 166, 255, 0.15);
+            border-color: var(--accent-blue);
+            transform: translateX(4px);
+        }
+
+        .option-btn.selected {
+            background: rgba(88, 166, 255, 0.2);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+            margin: 30px 0 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6c4675, var(--accent-pink));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+
+        .diagnosis-box {
+            background: rgba(255, 123, 156, 0.05);
+            border: 1px solid var(--accent-pink);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .diagnosis-item {
+            margin-bottom: 20px;
+        }
+
+        .diagnosis-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .diagnosis-label {
+            color: var(--accent-pink);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .diagnosis-text {
+            color: var(--text-primary);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+
+        .btn {
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6c4675, var(--accent-pink));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(88, 166, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid #6c4675;
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(88, 166, 255, 0.1);
+            border-color: #83169d;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+
+        .signature {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            text-align: right;
+        }
+
+        .signature-line {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .signature-name {
+            color: #6c4675;
+            font-weight: 500;
+        }
+
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 30px 20px;
+            }
+
             h1 {
-                font-size: 2em;
+                font-size: 26px;
             }
 
-            .container {
-                height: 1600px;
+            h2 {
+                font-size: 22px;
             }
 
-            .envelope-wrapper {
-                width: 160px;
-                height: 110px;
+            .question {
+                font-size: 16px;
+            }
+        }
+
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 123, 156, 0.4);
             }
 
-            .envelope-top {
-                border-left: 80px solid transparent;
-                border-right: 80px solid transparent;
-                border-bottom: 55px solid #e17055;
+            50% {
+                box-shadow: 0 0 0 15px rgba(255, 123, 156, 0);
             }
+        }
 
-            .letter-sheet {
-                padding: 40px 25px;
-            }
-
-            .letter-header h2 {
-                font-size: 2em;
-            }
-
-            .letter-body {
-                font-size: 1em;
-            }
+        .pulse-effect {
+            animation: pulse 2s infinite;
         }
     </style>
 </head>
 
 <body>
-    <h1>Mensajes especiales para mi Especial 💌</h1>
-    <p class="subtitle">Selecciona cualquier carta mascotita, psdt: alerta de cringe ⚠️, psdt x2: Estoy siendo sincero conlo que estoy escribiendo, te lo digo poque te conozco de especial y diras que es floreo o que esta hecho con IA⚠️ </p>
+    
+    <div class="ecg-container">
+        <div class="ecg-line">
+            <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
+                <path class="ecg-path" d="
+                    M0,60 L180,60 
+                    L185,60 L187,58 L189,60 L191,45 L193,15 L195,60 L197,75 L199,60 L205,60
+                    L380,60 
+                    L385,60 L387,58 L389,60 L391,45 L393,15 L395,60 L397,75 L399,60 L405,60
+                    L580,60 
+                    L585,60 L587,58 L589,60 L591,45 L593,15 L595,60 L597,75 L599,60 L605,60
+                    L780,60 
+                    L785,60 L787,58 L789,60 L791,45 L793,15 L795,60 L797,75 L799,60 L805,60
+                    L980,60 
+                    L985,60 L987,58 L989,60 L991,45 L993,15 L995,60 L997,75 L999,60 L1005,60
+                    L1180,60 
+                    L1185,60 L1187,58 L1189,60 L1191,45 L1193,15 L1195,60 L1197,75 L1199,60 L1205,60
+                    L1380,60 
+                    L1385,60 L1387,58 L1389,60 L1391,45 L1393,15 L1395,60 L1397,75 L1399,60 L1405,60
+                    L1580,60 
+                    L1585,60 L1587,58 L1589,60 L1591,45 L1593,15 L1595,60 L1597,75 L1599,60 L1605,60
+                    L1780,60 
+                    L1785,60 L1787,58 L1789,60 L1791,45 L1793,15 L1795,60 L1797,75 L1799,60 L1805,60
+                    L1980,60 
+                    L1985,60 L1987,58 L1989,60 L1991,45 L1993,15 L1995,60 L1997,75 L1999,60 L2005,60
+                    L2180,60 
+                    L2185,60 L2187,58 L2189,60 L2191,45 L2193,15 L2195,60 L2197,75 L2199,60 L2205,60
+                    L2400,60
+                " />
+            </svg>
+        </div>
 
-    <div class="container" id="envelopeContainer"></div>
 
-    <audio id="backgroundMusic" loop autoplay>
-        <source src="Jean Pi - Friendzone (Official Video)_[cut_208sec].mp3" type="audio/mpeg">
-    </audio>
+        <div class="ecg-line">
+            <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
+                <path class="ecg-path" d="
+                    M0,60 L180,60 
+                    L185,60 L187,58 L189,60 L191,45 L193,15 L195,60 L197,75 L199,60 L205,60
+                    L380,60 
+                    L385,60 L387,58 L389,60 L391,45 L393,15 L395,60 L397,75 L399,60 L405,60
+                    L580,60 
+                    L585,60 L587,58 L589,60 L591,45 L593,15 L595,60 L597,75 L599,60 L605,60
+                    L780,60 
+                    L785,60 L787,58 L789,60 L791,45 L793,15 L795,60 L797,75 L799,60 L805,60
+                    L980,60 
+                    L985,60 L987,58 L989,60 L991,45 L993,15 L995,60 L997,75 L999,60 L1005,60
+                    L1180,60 
+                    L1185,60 L1187,58 L1189,60 L1191,45 L1193,15 L1195,60 L1197,75 L1199,60 L1205,60
+                    L1380,60 
+                    L1385,60 L1387,58 L1389,60 L1391,45 L1393,15 L1395,60 L1397,75 L1399,60 L1405,60
+                    L1580,60 
+                    L1585,60 L1587,58 L1589,60 L1591,45 L1593,15 L1595,60 L1597,75 L1599,60 L1605,60
+                    L1780,60 
+                    L1785,60 L1787,58 L1789,60 L1791,45 L1793,15 L1795,60 L1797,75 L1799,60 L1805,60
+                    L1980,60 
+                    L1985,60 L1987,58 L1989,60 L1991,45 L1993,15 L1995,60 L1997,75 L1999,60 L2005,60
+                    L2180,60 
+                    L2185,60 L2187,58 L2189,60 L2191,45 L2193,15 L2195,60 L2197,75 L2199,60 L2205,60
+                    L2400,60
+                " />
+            </svg>
+        </div>
 
-    <div class="modal" id="modal">
-        <div class="letter-sheet">
-            <button class="close-btn" onclick="closeModal()">×</button>
-            <div class="letter-header">
-                <h2 id="letterTitle">Título</h2>
+        <div class="ecg-line">
+            <svg viewBox="0 0 2400 120" preserveAspectRatio="none">
+                <path class="ecg-path" d="
+                    M0,60 L180,60 
+                    L185,60 L187,58 L189,60 L191,45 L193,15 L195,60 L197,75 L199,60 L205,60
+                    L380,60 
+                    L385,60 L387,58 L389,60 L391,45 L393,15 L395,60 L397,75 L399,60 L405,60
+                    L580,60 
+                    L585,60 L587,58 L589,60 L591,45 L593,15 L595,60 L597,75 L599,60 L605,60
+                    L780,60 
+                    L785,60 L787,58 L789,60 L791,45 L793,15 L795,60 L797,75 L799,60 L805,60
+                    L980,60 
+                    L985,60 L987,58 L989,60 L991,45 L993,15 L995,60 L997,75 L999,60 L1005,60
+                    L1180,60 
+                    L1185,60 L1187,58 L1189,60 L1191,45 L1193,15 L1195,60 L1197,75 L1199,60 L1205,60
+                    L1380,60 
+                    L1385,60 L1387,58 L1389,60 L1391,45 L1393,15 L1395,60 L1397,75 L1399,60 L1405,60
+                    L1580,60 
+                    L1585,60 L1587,58 L1589,60 L1591,45 L1593,15 L1595,60 L1597,75 L1599,60 L1605,60
+                    L1780,60 
+                    L1785,60 L1787,58 L1789,60 L1791,45 L1793,15 L1795,60 L1797,75 L1799,60 L1805,60
+                    L1980,60 
+                    L1985,60 L1987,58 L1989,60 L1991,45 L1993,15 L1995,60 L1997,75 L1999,60 L2005,60
+                    L2180,60 
+                    L2185,60 L2187,58 L2189,60 L2191,45 L2193,15 L2195,60 L2197,75 L2199,60 L2205,60
+                    L2400,60
+                " />
+            </svg>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+
+            <div id="screen1" class="screen active">
+                <div class="header">
+                    <div class="badge">EXPEDIENTE CLÍNICO #140224</div>
+                    <h1>Consulta Clínica Especial</h1>
+                    <p class="subtitle">Evaluación del 14 de Febrero</p>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-row">
+                        <span class="info-label">Paciente detectada:</span>
+                        <span class="info-value patient-name">Camila Rosalia Medrano Barrionuevo</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Fecha de evaluación:</span>
+                        <span class="info-value">14 de Febrero, 2026</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Motivo de consulta:</span>
+                        <span class="info-value">Interacciones frecuentes hasta<br>altas horas de la madrugada</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Evaluador:</span>
+                        <span class="info-value">Ing. Sistemas (Especialista en debugging de sentimientos)</span>
+                    </div>
+                </div>
+
+                <div class="heartbeat-monitor">
+                    <span class="heart-icon">♥</span>
+                </div>
+
+                <button class="btn btn-primary" onclick="startEvaluation()">
+                    Iniciar evaluación →
+                </button>
             </div>
-            <div class="letter-body" id="letterBody">
-                <p>Contenido del mensaje...</p>
+
+            <div id="screen2" class="screen">
+                <div class="header">
+                    <div class="badge">EVALUACIÓN EN PROGRESO</div>
+                    <h2>Cuestionario Clínico</h2>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar"></div>
+                </div>
+                <div class="progress-text" id="progressText">Pregunta 1 de 5</div>
+
+                <div class="question-container" id="questionContainer">
+
+                </div>
+
+                <button class="btn btn-secondary" id="nextBtn" onclick="nextQuestion()" disabled>
+                    Siguiente pregunta →
+                </button>
             </div>
-            <div class="decorative-hearts">
-                <span>💕</span>
-                <span>✨</span>
-                <span>💖</span>
-                <span>✨</span>
-                <span>💕</span>
-            </div>
-            <div class="letter-footer">
-                <p>1 4 3</p>
-                <p class="signature">🐭</p>
+
+            <div id="screen3" class="screen">
+                <div class="header">
+                    <div class="badge">RESULTADOS DE EVALUACIÓN</div>
+                    <h2>Diagnóstico Preliminar</h2>
+                </div>
+
+                <div class="heartbeat-monitor">
+                    <span class="heart-icon pulse-effect">♥</span>
+                </div>
+
+                <div class="diagnosis-box">
+                    <div class="diagnosis-item">
+                        <div class="diagnosis-label">Diagnóstico</div>
+                        <div class="diagnosis-text">
+                            Disfruto mucho el tiempo contigo. Las madrugadas jugando y hablando
+                            se han vuelto de mis momentos favoritos del día.
+                        </div>
+                    </div>
+
+                    <div class="diagnosis-item">
+                        <div class="diagnosis-label">Pronóstico</div>
+                        <div class="diagnosis-text">
+                            Alta probabilidad de que sigamos acumulando partidas de LOLCITOS, risas y conversaciones que
+                            se alargan
+                            sin darnos cuenta. El cuadro evoluciona de forma bastante agradable.
+                        </div>
+                    </div>
+
+                    <div class="diagnosis-item">
+                        <div class="diagnosis-label">Recomendación médica</div>
+                        <div class="diagnosis-text">
+                            Mantener el contacto. No suspender tratamiento.
+                            Dosis: más tiempo juntos, sin prisa y viendo qué pasa.
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="finalAction()">
+                    ¿Seguimos con la observación clínica? →
+                </button>
+
+                <div class="signature">
+                    <div class="signature-line">
+                        <span class="signature-name">Con cariño y código,</span>
+                    </div>
+                    <div class="signature-line">Tu ingeniero favorito que debuggea hasta tarde</div>
+                    <div class="signature-line" style="margin-top: 12px; font-size: 11px;">
+                        P.D.: Este sitio fue hecho especialmente para ti 💙
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        const messages = [
+        const questions = [
             {
-                icon: "",
-                title: "Tu voz",
-                text: "Dices que no te gusta tu voz. Si supieras lo que me pasa cuando te escucho, me deja tonto cada vez lo oigo, me pongo muy pero muy morado y haces sacar mi sonrisa de mongol ofvkfgb. "
+                text: "Como futura doctora… ¿mi caso es interesante?",
+                options: ["Paciente curioso", "Necesita seguimiento", "Tratamiento prolongado"]
             },
             {
-                icon: "",
-                title: "Tu presencia",
-                text: "Aunque no estemos cerca.. cuando hablamos por chat y por llamada, se siente muy bonito la verdad, se me olvida todo, ahora imaginate si te llego a ver en persona, lit kgue porque me volvere mas mongol afvgbfgsedf."
+                text: "¿Las madrugadas de juego cuentan como terapia?",
+                options: ["Terapia experimental", "Aprobado por mí", "Recetar más sesiones"]
             },
             {
-                icon: "",
-                title: "Siempre en mi Mente",
-                text: "Este haciendo lo que sea terminas apareciendo en mis pensamientos xd, No me molesta, al contrario me sale la sonrisita sjngfjdh y es bonito sentir eso."
+                text: "¿Me robarías un órgano?",
+                options: ["Solo el corazón", "Depende del paciente", "No prometo nada"]
             },
             {
-                icon: "",
-                title: "Eres Inteligente y Especial",
-                text: "Enserio se nota el esfuerzo que le pones a tus estudios (aunque dijiste que no das al 100% como en el colegio), pero de mi perspectiva si lo estas dando todo, eso te hace muy especial 💖🐭"
+                text: "¿Nuestro humor es médicamente sano?",
+                options: ["Caos controlado", "Raro pero funcional", "Recomendado"]
             },
             {
-                icon: "",
-                title: "Simplemente tú",
-                text: "Tienes una forma de ser que me atrapa, sin que hagas nada especial. cada dia me gusta saber un poco mas de ti, conocerte mas, entenderte mas (NO PIENSES QUE ES FLOREO PORQUE TE MANDO A LOS CHAMOS)"
-            },
-            {
-                icon: "",
-                title: "Me gustas",
-                text: "Ya te lo dije antes, que me gustas, pero mas alla de eso, me importas un monton. Me encanta poder hablar contigo, en serio, se siente bonito."
-            },
-            {
-                icon: "",
-                title: "Perdon",
-                text: "Lo de la madrugada lo pense despues y me dio cosa, porque no queria que lo tomaras mal. Perdon si lo que dije te incomodo, no fue mi intencion (yo soy el rarito), Enserio te quiero y te tengo mucho cariño, lo ultimo que quiero es que algo que diga te haga sentir rara, me importas y mucho,  si algun dia no estas bien o te pasa algo, quiero que sepas que me vas a tener ahi o a CICI u capybara..... Y repito TE QUIERO MUCHO MASCOTITA 💖✨🫂"
+                text: "¿Te gustaría seguir conociéndome?",
+                options: ["Sin presión", "Podría ser", "Sí"]
             }
         ];
 
-        const positions = [
-            { top: '5%', left: '8%', rotation: -12 },
-            { top: '12%', left: '40%', rotation: 8 },
-            { top: '8%', left: '72%', rotation: -6 },
-            { top: '42%', left: '12%', rotation: 10 },
-            { top: '48%', left: '58%', rotation: -8 },
-            { top: '72%', left: '5%', rotation: 5 },
-            { top: '70%', left: '68%', rotation: -10 }
-        ];
+        let currentQuestion = 0;
+        let selectedAnswers = [];
 
-        const container = document.getElementById('envelopeContainer');
-        const modal = document.getElementById('modal');
-        const music = document.getElementById('backgroundMusic');
+        function startEvaluation() {
+            showScreen(2);
+            loadQuestion();
+        }
 
-        // Intentar reproducir la música automáticamente
-        document.addEventListener('DOMContentLoaded', () => {
-            music.play().catch(e => {
-                // Si falla el autoplay, intentar reproducir al primer click
-                document.body.addEventListener('click', () => {
-                    music.play();
-                }, { once: true });
-            });
-        });
+        function loadQuestion() {
+            const container = document.getElementById('questionContainer');
+            const q = questions[currentQuestion];
 
-        messages.forEach((message, index) => {
-            const envelopeContainer = document.createElement('div');
-            envelopeContainer.className = 'envelope-container';
-            envelopeContainer.style.top = positions[index].top;
-            envelopeContainer.style.left = positions[index].left;
-            envelopeContainer.style.transform = `rotate(${positions[index].rotation}deg)`;
-            envelopeContainer.style.zIndex = index + 1;
-
-            envelopeContainer.innerHTML = `
-                <div class="envelope-wrapper">
-                    <div class="envelope-top"></div>
-                    <div class="envelope-front">
-                        ${message.icon}
-                    </div>
+            container.innerHTML = `
+                <div class="question">
+                    <span class="question-number">${currentQuestion + 1}.</span>
+                    ${q.text}
+                </div>
+                <div class="options" id="options">
+                    ${q.options.map((option, index) => `
+                        <button class="option-btn" onclick="selectOption(${index})">
+                            ${option}
+                        </button>
+                    `).join('')}
                 </div>
             `;
 
-            envelopeContainer.addEventListener('click', () => {
-                envelopeContainer.classList.add('opened');
-                setTimeout(() => {
-                    openModal(message);
-                    setTimeout(() => {
-                        envelopeContainer.classList.remove('opened');
-                    }, 300);
-                }, 500);
+            updateProgress();
+        }
+
+        function selectOption(index) {
+
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected');
             });
 
-            container.appendChild(envelopeContainer);
-        });
 
-        function openModal(message) {
-            document.getElementById('letterTitle').textContent = message.title;
-            document.getElementById('letterBody').innerHTML = `<p>${message.text}</p>`;
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            document.querySelectorAll('.option-btn')[index].classList.add('selected');
+
+
+            selectedAnswers[currentQuestion] = index;
+
+
+            document.getElementById('nextBtn').disabled = false;
         }
 
-        function closeModal() {
-            modal.classList.remove('active');
-            document.body.style.overflow = 'auto';
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+                document.getElementById('nextBtn').disabled = true;
+            } else {
+                showScreen(3);
+            }
         }
 
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal();
-            }
-        });
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+        }
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && modal.classList.contains('active')) {
-                closeModal();
-            }
-        });
+        function showScreen(screenNumber) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById('screen' + screenNumber).classList.add('active');
+        }
+
+        function finalAction() {
+            alert('¡Perfecto! 😊 Sigamos conociendonos paso a paso. Happy Valentine\'s Day! 💙');
+        }
     </script>
+    <audio id="backgroundMusic" loop autoplay>
+        <source src="Jean Pi - Friendzone (Official Video)_[cut_208sec].mp3" type="audio/mpeg">
+    </audio>
 </body>
 
 </html>

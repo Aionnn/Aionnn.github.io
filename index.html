@@ -816,6 +816,17 @@
         function finalAction() {
             alert('¡Perfecto! 😊 Sigamos conociendonos paso a paso. Happy Valentine\'s Day! 💙');
         }
+
+        // Reproducir música automáticamente
+        const music = document.getElementById('backgroundMusic');
+        document.addEventListener('DOMContentLoaded', () => {
+            music.play().catch(e => {
+                // Si falla el autoplay, intentar reproducir al primer click
+                document.body.addEventListener('click', () => {
+                    music.play();
+                }, { once: true });
+            });
+        });
     </script>
     <audio id="backgroundMusic" loop autoplay>
         <source src="Jean Pi - Friendzone (Official Video)_[cut_208sec].mp3" type="audio/mpeg">

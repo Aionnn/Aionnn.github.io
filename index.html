@@ -497,13 +497,25 @@
     visibility:visible;
     transition:height var(--dur) var(--ease) var(--open-delay), visibility 0s;
   }
+
+  /* ÁREA CON SCROLL (corregida para pantallas táctiles):
+     overflow-y siempre en "auto", touch-action le indica al navegador
+     que aquí se desliza en vertical y overscroll-behavior evita que el
+     gesto se "escape" a la página. */
   .paper-clip{
     height:100%;
-    overflow:hidden;
+    overflow-x:hidden;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    touch-action:pan-y;
     scrollbar-width:thin;
     scrollbar-color:rgba(122,80,28,.55) transparent;
   }
-  .scroll.open.settled .paper-clip{overflow-x:hidden;overflow-y:auto;}
+  /* mientras se desenrolla, sin barra visible */
+  .scroll:not(.settled) .paper-clip{scrollbar-width:none;}
+  .scroll:not(.settled) .paper-clip::-webkit-scrollbar{display:none;}
+
   .paper{
     position:relative;
     min-height:250px;
@@ -1072,6 +1084,7 @@
   const openBtn  = document.getElementById("scrollOpen");
   const dim      = document.getElementById("scrollDim");
   const burstBox = document.getElementById("petalBurst");
+  const clip     = scrollEl.querySelector(".paper-clip");
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let scrollOpen = false, scrollTimer = null, settleTimer = null, burstTimer = null;
 
@@ -1130,18 +1143,86 @@
     meadowWrap.classList.remove("scroll-open");
     openBtn.setAttribute("aria-expanded","false");
     openBtn.setAttribute("aria-label","Abrir el pergamino");
+    clip.scrollTop = 0;   // al volver a abrirlo, el mensaje empieza desde arriba
   }
 
-  /* tocar el pergamino (rollos o papel) lo abre / lo enrolla */
+  /* ---- distinguir un TOQUE de un gesto de DESLIZAR ----
+     Si el dedo (o el mouse) se movió más de 8px, no cuenta como clic. */
+  let downX = 0, downY = 0, moved = false, lastPointerType = "mouse";
+  scrollEl.addEventListener("pointerdown", (e)=>{
+    downX = e.clientX; downY = e.clientY; moved = false;
+    lastPointerType = e.pointerType || "mouse";
+  });
+  scrollEl.addEventListener("pointermove", (e)=>{
+    if(Math.abs(e.clientX - downX) > 8 || Math.abs(e.clientY - downY) > 8) moved = true;
+  });
+
+  /* tocar el pergamino lo abre / lo enrolla.
+     - Con mouse: tocar los rollos o el papel lo enrolla (como antes).
+     - En pantallas táctiles: el papel NO se cierra al tocarlo (para poder
+       leer y deslizar tranquila); solo se enrolla tocando los rollos
+       o el fondo oscuro. */
   scrollEl.addEventListener("click", (e)=>{
     if(!scrollOpen){ openScroll(); return; }
+    if(moved) return;                                                      // fue un deslizamiento, no un toque
     const sel = window.getSelection && window.getSelection().toString();
     if(sel) return;                                                        // si está seleccionando texto para copiarlo, no cerrar
     if(e.target.classList.contains("paper-clip") && e.offsetX > e.target.clientWidth) return;   // barra de desplazamiento
+    if(lastPointerType !== "mouse" && e.target.closest && e.target.closest(".paper-wrap")) return;   // táctil: tocar el papel no cierra
     closeScroll();
   });
   dim.addEventListener("click", closeScroll);                       // tocar fuera del papel también lo enrolla
   document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeScroll(); });
+
+  /* ---- scroll táctil de respaldo ----
+     Normalmente el navegador desliza el papel solo. Pero si en algún
+     celular/tablet el dedo se mueve y el papel NO se desplaza, esto toma
+     el control y mueve el scroll a mano (con un poco de inercia). Si el
+     scroll nativo funciona, este código no interviene. */
+  let tStartY = 0, tStartTop = 0, tLastY = 0, tLastT = 0, tVel = 0;
+  let tDragging = false, tManual = false, tChecking = false, tRaf = 0;
+
+  clip.addEventListener("touchstart", (e)=>{
+    cancelAnimationFrame(tRaf);
+    tStartY = tLastY = e.touches[0].clientY;
+    tStartTop = clip.scrollTop;
+    tLastT = e.timeStamp; tVel = 0;
+    tDragging = true; tManual = false; tChecking = false;
+  }, {passive:true});
+
+  clip.addEventListener("touchmove", (e)=>{
+    if(!tDragging || clip.scrollHeight <= clip.clientHeight) return;
+    const y  = e.touches[0].clientY;
+    const dy = tStartY - y;
+    const dt = e.timeStamp - tLastT;
+    if(dt > 0) tVel = (tLastY - y) / dt;                    // px por ms
+    tLastY = y; tLastT = e.timeStamp;
+
+    if(!tManual){
+      /* ¿el navegador está desplazando? Si tras 2 frames el scroll no se movió, lo hacemos nosotros */
+      if(Math.abs(dy) > 10 && !tChecking){
+        tChecking = true;
+        requestAnimationFrame(()=>requestAnimationFrame(()=>{
+          tChecking = false;
+          if(tDragging && Math.abs(clip.scrollTop - tStartTop) < 1) tManual = true;
+        }));
+      }
+      return;
+    }
+    clip.scrollTop = tStartTop + dy;
+  }, {passive:true});
+
+  function tEnd(){
+    tDragging = false;
+    if(!tManual) return;
+    (function glide(){
+      clip.scrollTop += tVel * 16;
+      tVel *= 0.94;
+      if(Math.abs(tVel) > 0.02) tRaf = requestAnimationFrame(glide);
+    })();
+  }
+  clip.addEventListener("touchend", tEnd);
+  clip.addEventListener("touchcancel", tEnd);
 
 })();
 </script>

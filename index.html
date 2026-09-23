@@ -141,7 +141,6 @@
     max-width:44ch;
     margin:14px auto 0;
     line-height:1.6;
-    transition:color 1s ease;
   }
   body.night .hero-copy p{color:#a9b3d8;}
 
@@ -231,9 +230,83 @@
     filter:drop-shadow(0 0 4px rgba(255,224,120,.9));
     transition:opacity 1s ease;
   }
+  #fireflyLayer{pointer-events:none;}
   body.night .firefly{animation:drift 7s ease-in-out infinite, glow 2.4s ease-in-out infinite;opacity:.9;}
   @keyframes drift{0%{transform:translate(0,0);}50%{transform:translate(14px,-22px);}100%{transform:translate(0,0);}}
   @keyframes glow{0%,100%{opacity:.25;}50%{opacity:1;}}
+
+  /* ---------- CATCH-THE-BLUE-FLOWERS GAME ---------- */
+  .catch-hud{
+    position:absolute;
+    top:calc(env(safe-area-inset-top,0px) + 14px);
+    left:50%;
+    transform:translateX(-50%);
+    z-index:6;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    background:rgba(20,26,50,.55);
+    border:1px solid rgba(233,226,196,.22);
+    backdrop-filter:blur(6px);
+    color:#f2e8c8;
+    font-family:'Inter',sans-serif;
+    font-size:12.5px;
+    padding:8px 14px;
+    border-radius:999px;
+    transition:opacity .6s ease, transform .6s ease, visibility 0s;
+  }
+  .catch-hud .dots{display:flex;gap:4px;}
+  .catch-hud .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:rgba(255,255,255,.22);
+    transition:background .3s ease, transform .3s ease;
+  }
+  .catch-hud .dot.on{background:var(--petal-blue-light);transform:scale(1.15);}
+  .catch-hud.done{color:#ffe9ad;}
+  .catch-hud.hide{opacity:0;transform:translate(-50%,-14px);visibility:hidden;}
+
+  .flower{cursor:pointer;}
+  .flower.pollen-shake{animation:pollenShake .45s ease;}
+  @keyframes pollenShake{
+    0%,100%{transform:rotate(0deg);}
+    25%{transform:rotate(-4deg);}
+    55%{transform:rotate(3.5deg);}
+    80%{transform:rotate(-1.5deg);}
+  }
+  .pollen-puff{position:absolute;left:0;top:0;z-index:5;pointer-events:none;}
+  .pollen-puff span{
+    position:absolute;left:0;top:0;
+    width:5px;height:5px;margin:-2.5px 0 0 -2.5px;
+    border-radius:50%;
+    background:radial-gradient(circle, #fff3c4 0%, #f2c245 60%, rgba(242,194,69,0) 100%);
+  }
+  .flower-msg{
+    position:absolute;
+    z-index:9;
+    pointer-events:none;
+    font-family:'Dancing Script','Segoe Script','Brush Script MT',cursive;
+    font-weight:600;
+    font-size:clamp(1.15rem,3.6vw,1.5rem);
+    color:#fff6da;
+    text-shadow:0 2px 10px rgba(0,0,0,.55), 0 0 16px rgba(255,206,61,.55);
+    white-space:nowrap;
+  }
+  .flower.blue-bloom.catchable:hover{filter:brightness(1.18);}
+  .flower.blue-bloom.caught{pointer-events:none;}
+  .flower.blue-bloom.catch-pop{animation:catchPop .55s cubic-bezier(.3,1.6,.4,1) forwards;}
+  @keyframes catchPop{
+    0%{transform:scale(1);opacity:1;}
+    45%{transform:scale(1.35);opacity:1;}
+    100%{transform:scale(0);opacity:0;}
+  }
+  .catch-sparkle{position:absolute;left:0;top:0;z-index:5;pointer-events:none;}
+  .catch-sparkle span{
+    position:absolute;left:0;top:0;
+    width:6px;height:6px;margin:-3px 0 0 -3px;
+    border-radius:50%;
+    background:var(--petal-blue-light);
+    box-shadow:0 0 6px 1px rgba(143,179,232,.9);
+  }
 
   /* ---------- LETTER GARDEN (leave a message) ---------- */
   main{position:relative;background:var(--paper);}
@@ -448,6 +521,7 @@
     cursor:pointer;
     -webkit-tap-highlight-color:transparent;
   }
+  .scroll.locked{cursor:not-allowed;filter:drop-shadow(0 20px 18px rgba(0,0,0,.45)) saturate(.55) brightness(.86);}
 
   /* -- rollos -- */
   .roll{
@@ -469,8 +543,8 @@
     background-size:100% 100%;
     background-repeat:no-repeat;
   }
-  .roll::before{left:-14px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 80' preserveAspectRatio='none'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.45' cy='.45' r='.7'%3E%3Cstop offset='0' stop-color='%23fdf1cf'/%3E%3Cstop offset='.65' stop-color='%23eed393'/%3E%3Cstop offset='1' stop-color='%23c8974c'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cg%3E%3Cellipse cx='15' cy='40' rx='14' ry='39' fill='url(%23g)' stroke='%236f441a' stroke-width='1.1'/%3E%3Cpath d='M15.6,40.0 L15.7,40.3 L15.7,40.6 L15.8,40.9 L15.8,41.3 L15.8,41.7 L15.8,42.1 L15.7,42.6 L15.6,43.0 L15.5,43.4 L15.4,43.7 L15.3,44.1 L15.1,44.3 L14.9,44.6 L14.7,44.7 L14.5,44.7 L14.3,44.7 L14.0,44.6 L13.8,44.3 L13.6,44.0 L13.4,43.5 L13.2,43.0 L13.0,42.4 L12.8,41.7 L12.7,40.9 L12.6,40.0 L12.6,39.1 L12.5,38.1 L12.6,37.2 L12.7,36.2 L12.8,35.2 L12.9,34.3 L13.2,33.4 L13.4,32.6 L13.7,31.9 L14.0,31.3 L14.4,30.8 L14.8,30.5 L15.2,30.3 L15.6,30.2 L16.1,30.3 L16.5,30.6 L16.9,31.1 L17.3,31.7 L17.7,32.5 L18.1,33.4 L18.4,34.5 L18.7,35.7 L18.9,37.1 L19.0,38.5 L19.2,40.0 L19.2,41.6 L19.2,43.2 L19.1,44.7 L18.9,46.3 L18.6,47.8 L18.3,49.2 L18.0,50.6 L17.5,51.8 L17.0,52.8 L16.5,53.6 L15.9,54.3 L15.3,54.7 L14.7,54.9 L14.0,54.9 L13.4,54.6 L12.8,54.1 L12.1,53.3 L11.5,52.3 L11.0,51.1 L10.5,49.6 L10.1,48.0 L9.7,46.2 L9.4,44.2 L9.2,42.2 L9.1,40.0 L9.1,37.8 L9.1,35.6 L9.3,33.3 L9.6,31.2 L9.9,29.1 L10.4,27.2 L10.9,25.4 L11.5,23.9 L12.2,22.5 L13.0,21.4 L13.7,20.6 L14.6,20.1 L15.4,19.9 L16.3,20.0 L17.2,20.4 L18.0,21.2 L18.8,22.3 L19.6,23.7 L20.3,25.4 L20.9,27.3 L21.5,29.5 L21.9,31.9 L22.3,34.5 L22.5,37.2 L22.7,40.0 L22.7,42.9 L22.6,45.7 L22.3,48.6 L22.0,51.3 L21.5,53.9 L20.9,56.4 L20.2,58.6 L19.4,60.5 L18.5,62.2 L17.6,63.5 L16.6,64.5 L15.5,65.1 L14.5,65.3 L13.4,65.1 L12.3,64.5 L11.3,63.5 L10.2,62.1 L9.3,60.3 L8.4,58.2 L7.7,55.8 L7.0,53.0 L6.4,50.0 L6.0,46.8 L5.7,43.5 L5.6,40.0 L5.6,36.5 L5.7,33.0 L6.0,29.5 L6.5,26.2 L7.1,23.0 L7.8,20.1 L8.7,17.4 L9.6,15.1 L10.7,13.1 L11.9,11.5 L13.1,10.4 L14.4,9.7 L15.6,9.5 L17.0,9.8 L18.2,10.6 L19.5,11.8 L20.7,13.5 L21.8,15.7 L22.9,18.2 L23.8,21.2 L24.6,24.5 L25.2,28.1 L25.7,31.9 L26.0,35.9 L26.2,40.0 L26.2,44.2 L26.0,48.3 L25.6,52.4 L25.1,56.3 L24.3,60.0 L23.5,63.5 L22.4,66.6 L21.3,69.3 L20.0,71.6 L18.7,73.4 L17.2,74.7 L15.8,75.5 L14.2,75.7 L12.7,75.3 L11.2,74.4 L9.8,72.9 L8.4,70.9 L7.1,68.3 L5.9,65.3 L4.8,61.9' fill='none' stroke='%237d4f1e' stroke-opacity='.72' stroke-width='.95' stroke-linejoin='round'/%3E%3Cellipse cx='15' cy='40' rx='14' ry='39' fill='none' stroke='%23fff3cf' stroke-opacity='.35' stroke-width='.6' transform='translate(.4 .4)'/%3E%3C/g%3E%3C/svg%3E");}
-  .roll::after{right:-14px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 80' preserveAspectRatio='none'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.45' cy='.45' r='.7'%3E%3Cstop offset='0' stop-color='%23fdf1cf'/%3E%3Cstop offset='.65' stop-color='%23eed393'/%3E%3Cstop offset='1' stop-color='%23c8974c'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cg transform='translate(30 0) scale(-1 1)'%3E%3Cellipse cx='15' cy='40' rx='14' ry='39' fill='url(%23g)' stroke='%236f441a' stroke-width='1.1'/%3E%3Cpath d='M15.6,40.0 L15.7,40.3 L15.7,40.6 L15.8,40.9 L15.8,41.3 L15.8,41.7 L15.8,42.1 L15.7,42.6 L15.6,43.0 L15.5,43.4 L15.4,43.7 L15.3,44.1 L15.1,44.3 L14.9,44.6 L14.7,44.7 L14.5,44.7 L14.3,44.7 L14.0,44.6 L13.8,44.3 L13.6,44.0 L13.4,43.5 L13.2,43.0 L13.0,42.4 L12.8,41.7 L12.7,40.9 L12.6,40.0 L12.6,39.1 L12.5,38.1 L12.6,37.2 L12.7,36.2 L12.8,35.2 L12.9,34.3 L13.2,33.4 L13.4,32.6 L13.7,31.9 L14.0,31.3 L14.4,30.8 L14.8,30.5 L15.2,30.3 L15.6,30.2 L16.1,30.3 L16.5,30.6 L16.9,31.1 L17.3,31.7 L17.7,32.5 L18.1,33.4 L18.4,34.5 L18.7,35.7 L18.9,37.1 L19.0,38.5 L19.2,40.0 L19.2,41.6 L19.2,43.2 L19.1,44.7 L18.9,46.3 L18.6,47.8 L18.3,49.2 L18.0,50.6 L17.5,51.8 L17.0,52.8 L16.5,53.6 L15.9,54.3 L15.3,54.7 L14.7,54.9 L14.0,54.9 L13.4,54.6 L12.8,54.1 L12.1,53.3 L11.5,52.3 L11.0,51.1 L10.5,49.6 L10.1,48.0 L9.7,46.2 L9.4,44.2 L9.2,42.2 L9.1,40.0 L9.1,37.8 L9.1,35.6 L9.3,33.3 L9.6,31.2 L9.9,29.1 L10.4,27.2 L10.9,25.4 L11.5,23.9 L12.2,22.5 L13.0,21.4 L13.7,20.6 L14.6,20.1 L15.4,19.9 L16.3,20.0 L17.2,20.4 L18.0,21.2 L18.8,22.3 L19.6,23.7 L20.3,25.4 L20.9,27.3 L21.5,29.5 L21.9,31.9 L22.3,34.5 L22.5,37.2 L22.7,40.0 L22.7,42.9 L22.6,45.7 L22.3,48.6 L22.0,51.3 L21.5,53.9 L20.9,56.4 L20.2,58.6 L19.4,60.5 L18.5,62.2 L17.6,63.5 L16.6,64.5 L15.5,65.1 L14.5,65.3 L13.4,65.1 L12.3,64.5 L11.3,63.5 L10.2,62.1 L9.3,60.3 L8.4,58.2 L7.7,55.8 L7.0,53.0 L6.4,50.0 L6.0,46.8 L5.7,43.5 L5.6,40.0 L5.6,36.5 L5.7,33.0 L6.0,29.5 L6.5,26.2 L7.1,23.0 L7.8,20.1 L8.7,17.4 L9.6,15.1 L10.7,13.1 L11.9,11.5 L13.1,10.4 L14.4,9.7 L15.6,9.5 L17.0,9.8 L18.2,10.6 L19.5,11.8 L20.7,13.5 L21.8,15.7 L22.9,18.2 L23.8,21.2 L24.6,24.5 L25.2,28.1 L25.7,31.9 L26.0,35.9 L26.2,40.0 L26.2,44.2 L26.0,48.3 L25.6,52.4 L25.1,56.3 L24.3,60.0 L23.5,63.5 L22.4,66.6 L21.3,69.3 L20.0,71.6 L18.7,73.4 L17.2,74.7 L15.8,75.5 L14.2,75.7 L12.7,75.3 L11.2,74.4 L9.8,72.9 L8.4,70.9 L7.1,68.3 L5.9,65.3 L4.8,61.9' fill='none' stroke='%237d4f1e' stroke-opacity='.72' stroke-width='.95' stroke-linejoin='round'/%3E%3Cellipse cx='15' cy='40' rx='14' ry='39' fill='none' stroke='%23fff3cf' stroke-opacity='.35' stroke-width='.6' transform='translate(.4 .4)'/%3E%3C/g%3E%3C/svg%3E");}
+  .roll::before{left:-14px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 80' preserveAspectRatio='none'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.45' cy='.45' r='.7'%3E%3Cstop offset='0' stop-color='%23fdf1cf'/%3E%3Cstop offset='.65' stop-color='%23eed393'/%3E%3Cstop offset='1' stop-color='%23c8974c'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cg%3E%3Cellipse cx='15' cy='40' rx='14' ry='39' fill='url(%23g)' stroke='%236f441a' stroke-width='1.1'/%3E%3C/g%3E%3C/svg%3E");}
+  .roll::after{right:-14px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 80' preserveAspectRatio='none'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.45' cy='.45' r='.7'%3E%3Cstop offset='0' stop-color='%23fdf1cf'/%3E%3Cstop offset='.65' stop-color='%23eed393'/%3E%3Cstop offset='1' stop-color='%23c8974c'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cg transform='translate(30 0) scale(-1 1)'%3E%3Cellipse cx='15' cy='40' rx='14' ry='39' fill='url(%23g)' stroke='%236f441a' stroke-width='1.1'/%3E%3C/g%3E%3C/svg%3E");}
 
   /* cerrado: el rollo de abajo se superpone exactamente sobre el de arriba */
   .roll-bottom{
@@ -498,10 +572,6 @@
     transition:height var(--dur) var(--ease) var(--open-delay), visibility 0s;
   }
 
-  /* ÁREA CON SCROLL (corregida para pantallas táctiles):
-     overflow-y siempre en "auto", touch-action le indica al navegador
-     que aquí se desliza en vertical y overscroll-behavior evita que el
-     gesto se "escape" a la página. */
   .paper-clip{
     height:100%;
     overflow-x:hidden;
@@ -512,7 +582,6 @@
     scrollbar-width:thin;
     scrollbar-color:rgba(122,80,28,.55) transparent;
   }
-  /* mientras se desenrolla, sin barra visible */
   .scroll:not(.settled) .paper-clip{scrollbar-width:none;}
   .scroll:not(.settled) .paper-clip::-webkit-scrollbar{display:none;}
 
@@ -528,7 +597,6 @@
       var(--grain),
       linear-gradient(180deg,#f5e5b6,#efd9a0);
   }
-  /* doble filo decorativo */
   .paper::before,.paper::after{
     content:"";position:absolute;pointer-events:none;
     border:1px solid rgba(122,80,28,.30);
@@ -537,7 +605,6 @@
   .paper::before{inset:14px;}
   .paper::after{inset:19px;border-color:rgba(122,80,28,.16);}
 
-  /* sombra de los rollos sobre el papel + bordes quemados */
   .paper-shade{
     position:absolute;inset:0;z-index:3;pointer-events:none;
     background:
@@ -547,7 +614,6 @@
       linear-gradient(270deg,rgba(110,64,16,.42) 0,rgba(110,64,16,0) 30px);
   }
 
-  /* texto del mensaje */
   .paper-content{
     position:relative;
     z-index:1;
@@ -670,6 +736,7 @@
   .scroll.open .scroll-hit{top:0;height:var(--roll-h);}
   .scroll-hit:focus-visible{outline:2px solid var(--petal);outline-offset:4px;}
   .scroll:not(.open):hover .roll{filter:brightness(1.07);}
+  .scroll.locked:hover .roll{filter:none;}
 
   /* -- pista y botón de volver a enrollar (comparten el mismo lugar) -- */
   .scroll-foot{
@@ -718,6 +785,7 @@
     .paper .signature{font-size:1.5rem;}
     .paper::before{inset:10px;}
     .paper::after{inset:14px;}
+    .catch-hud{font-size:11.5px;padding:7px 12px;gap:7px;}
   }
   @media (max-height:560px){
     .scroll{--roll-h:52px;}
@@ -745,8 +813,6 @@
     .field{height:48%;}
   }
 
-  /* Wider/landscape viewports: grow the grass proportion last, so it wins
-     over the short-viewport rule above for phones held sideways. */
   @media (min-aspect-ratio:4/3){
     .field{height:66%;}
     .hill{height:74%;}
@@ -771,12 +837,6 @@
 </head>
 <body class="night">
 
-<!-- ================================================================
-     MÚSICA DE FONDO
-     Pon tu archivo .mp3 en la MISMA CARPETA que este archivo HTML
-     y llámalo:  musica.mp3
-     (si prefieres otro nombre, cámbialo aquí en src="...")
-     ================================================================ -->
 <audio id="bgMusic" src="Ojos Caramelo - Ivan Horrocks (youtube).mp3" loop preload="auto"></audio>
 
 <div class="meadow-wrap" id="meadowWrap">
@@ -793,7 +853,12 @@
   <div class="hero-copy">
     <p class="for"></p>
     <h1>Un campo de flores</h1>
-    <p>Amarillas y algunas azules porque se que son las que te gustan. Toca el pergamino: te dejé algo escrito.</p>
+    <p>Amarillas y algunas azules porque se que son las que te gustan. Atrapa las 3 flores azules del pasto para desbloquear el pergamino.</p>
+  </div>
+
+  <div class="catch-hud" id="catchHud">
+    <span id="catchLabel">Atrapa las flores azules del pasto: 0/3</span>
+    <span class="dots" id="catchDots"></span>
   </div>
 
   <div class="ambient-toggles">
@@ -821,11 +886,10 @@
     <div class="scroll-glow" aria-hidden="true"></div>
 
     <div class="scroll-wrap">
-      <div class="scroll" id="scroll">
-        <!-- botón invisible que cubre el pergamino cerrado -->
+      <div class="scroll locked" id="scroll">
         <button class="scroll-hit" id="scrollOpen" type="button"
                 aria-expanded="false" aria-controls="scrollMessage"
-                aria-label="Abrir el pergamino"></button>
+                aria-label="Atrapa 3 flores azules del pasto para abrir el pergamino"></button>
 
         <div class="roll roll-top" aria-hidden="true"></div>
 
@@ -852,13 +916,6 @@
                   <i></i>
                 </div>
 
-                <!-- ============================================
-                     ✏️  ESCRIBE TU MENSAJE AQUÍ
-                     - Cambia el título (h3)
-                     - Cada <p>...</p> es un párrafo; copia y pega
-                       los que necesites
-                     - Cambia la firma al final
-                     ============================================ -->
                 <h3>Para ti, Nicole</h3>
                 <p>No sabia muy bien cómo empezar esto, porque muchas de estas cosas quiza ya te las he dicho en persona, pero aun asi, quiero escribirlas, porque si tengo que repetírtelas una y mil veces lo volveria hacer para que no olvides lo mucho que vales para mi.</p>
                 <p>Se que has pasado por muchas cosas, las experiencias que has vivido y que poco a poco dejaste de esperar "demasiado" de los demas. Quiza simplemente te acostumbraste a no esperar ciertas cosas, porque aprendiste que no siempre llegan como uno quisiera. Y aunque no puedo cambiar lo que has vivido, sí quiero que sepas que para mí, mereces recibir cariño, atención y todos esos pequeños detalles que hacen sentir ESPECIAL a una persona.</p>
@@ -879,7 +936,6 @@
                 <br>
                 <p>psdt: Trate de evitar los "equisde" "xd" para no malograr el mensaje jeje</p>
                 <p class="signature">El Utepino— John</p>
-                <!-- ============ FIN DEL MENSAJE ============ -->
 
               </div>
             </div>
@@ -909,15 +965,12 @@
                 <path d="M53,40 C44,24 24,15 12,28" fill="none" stroke="#cfe0fa" stroke-opacity=".6" stroke-width="2" stroke-linecap="round"/>
               </g>
             </defs>
-            <!-- colas -->
             <path d="M56,54 C50,70 40,84 27,98 L40,93 L44,104 C55,90 61,72 62,56 Z" fill="url(#tailGrad)" stroke="#1d3868" stroke-width=".7" stroke-linejoin="round"/>
             <path d="M64,54 C70,70 80,84 93,98 L80,93 L76,104 C65,90 59,72 58,56 Z" fill="url(#tailGrad)" stroke="#1d3868" stroke-width=".7" stroke-linejoin="round"/>
             <path d="M52,66 C48,76 42,84 36,91" fill="none" stroke="#9dbdf0" stroke-opacity=".45" stroke-width="1.6" stroke-linecap="round"/>
             <path d="M68,66 C72,76 78,84 84,91" fill="none" stroke="#9dbdf0" stroke-opacity=".45" stroke-width="1.6" stroke-linecap="round"/>
-            <!-- lazos -->
             <use href="#bowLoop"/>
             <use href="#bowLoop" transform="translate(120 0) scale(-1 1)"/>
-            <!-- nudo -->
             <rect x="51" y="38" width="18" height="18" rx="6" fill="url(#bowGrad)" stroke="#1d3868" stroke-width=".8"/>
             <rect x="55" y="41" width="5" height="12" rx="2.5" fill="#cfe0fa" opacity=".5"/>
           </svg>
@@ -925,7 +978,7 @@
       </div>
 
       <div class="scroll-foot">
-        <p class="scroll-hint">Toca el pergamino para abrirlo</p>
+        <p class="scroll-hint" id="scrollHint">Atrapa las 3 flores azules del pasto para abrir el pergamino</p>
       </div>
 
       <div class="petal-burst" id="petalBurst" aria-hidden="true"></div>
@@ -976,15 +1029,203 @@
     wrap.style.overflow="visible";
     wrap.setAttribute("viewBox","-45 -110 90 120");
     const id = "f"+Math.random().toString(36).slice(2,9);
-    wrap.innerHTML = flowerMarkup(id, colorMode);
+    wrap.innerHTML = '<rect x="-45" y="-110" width="90" height="120" fill="transparent" pointer-events="all"></rect>' + flowerMarkup(id, colorMode);
     layer.appendChild(wrap);
     return wrap;
   }
 
   const backLayer = document.getElementById("backLayer");
   const frontLayer = document.getElementById("frontLayer");
-  for(let i=0;i<16;i++) placeFlower(backLayer, rand(0,100), rand(-2,10), rand(0.45,0.65), Math.random()<0.18?"blue":"yellow");
-  for(let i=0;i<11;i++) placeFlower(frontLayer, rand(2,98), rand(-4,4), rand(0.8,1.15), Math.random()<0.22?"blue":"yellow");
+  const blueFlowerWraps = []; // background blue flowers - decorative only, not catchable
+  const grassBlueFlowerWraps = []; // foreground ("pasto") blue flowers - these are catchable
+  const yellowFlowerWraps = []; // yellow flowers - release pollen when tapped
+
+  for(let i=0;i<16;i++){
+    const isBlue = Math.random()<0.30;
+    const wrap = placeFlower(backLayer, rand(0,100), rand(-2,10), rand(0.45,0.65), isBlue?"blue":"yellow");
+    if(isBlue) blueFlowerWraps.push(wrap); else yellowFlowerWraps.push(wrap);
+  }
+  for(let i=0;i<11;i++){
+    const isBlue = Math.random()<0.34;
+    const wrap = placeFlower(frontLayer, rand(2,98), rand(-4,4), rand(0.8,1.15), isBlue?"blue":"yellow");
+    if(isBlue) grassBlueFlowerWraps.push(wrap); else yellowFlowerWraps.push(wrap);
+  }
+
+  /* ---------------- catch-the-blue-flowers game ---------------- */
+  const CATCH_GOAL = 3;
+  const catchHud = document.getElementById("catchHud");
+  const catchLabel = document.getElementById("catchLabel");
+  const catchDots = document.getElementById("catchDots");
+  const scrollHintEl = document.getElementById("scrollHint");
+  let caught = 0;
+
+  // Build the dot tracker
+  for(let i=0;i<CATCH_GOAL;i++){
+    const d = document.createElement("span");
+    d.className = "dot";
+    catchDots.appendChild(d);
+  }
+
+  // Only flowers in the grass (foreground layer) are selectable. If there
+  // aren't enough blue ones there yet, plant a few more so the game can
+  // always be completed.
+  while(grassBlueFlowerWraps.length < CATCH_GOAL){
+    const wrap = placeFlower(frontLayer, rand(2,98), rand(-4,4), rand(0.85,1.15), "blue");
+    grassBlueFlowerWraps.push(wrap);
+  }
+
+  // Pick exactly CATCH_GOAL blue grass flowers to be "catchable" (in case there are extra)
+  const shuffled = grassBlueFlowerWraps.slice().sort(()=>Math.random()-0.5);
+  const catchTargets = shuffled.slice(0, CATCH_GOAL);
+
+  function sparkleAt(wrap){
+    const ns = "http://www.w3.org/2000/svg";
+    const box = document.createElementNS(ns,"g");
+    // We can't easily append an HTML sparkle burst inside an SVG flower cleanly,
+    // so instead we do a lightweight DOM overlay positioned at the flower.
+    const rect = wrap.getBoundingClientRect();
+    const holder = document.createElement("div");
+    holder.className = "catch-sparkle";
+    holder.style.left = (rect.left + rect.width/2 + window.scrollX) + "px";
+    holder.style.top = (rect.top + rect.height*0.18 + window.scrollY) + "px";
+    document.body.appendChild(holder);
+    for(let i=0;i<10;i++){
+      const s = document.createElement("span");
+      holder.appendChild(s);
+      const ang = rand(0, Math.PI*2);
+      const dist = rand(20,55);
+      const dx = Math.cos(ang)*dist;
+      const dy = Math.sin(ang)*dist;
+      if(s.animate){
+        const anim = s.animate([
+          {transform:"translate(0,0) scale(1)", opacity:1},
+          {transform:`translate(${dx}px,${dy}px) scale(.2)`, opacity:0}
+        ],{duration:rand(500,850), easing:"cubic-bezier(.2,.7,.3,1)", fill:"forwards"});
+        anim.onfinish = ()=>{};
+      }
+    }
+    setTimeout(()=>holder.remove(), 950);
+  }
+
+  function updateHud(){
+    catchLabel.textContent = caught >= CATCH_GOAL
+      ? "¡Pergamino desbloqueado! 💛"
+      : `Atrapa las flores azules: ${caught}/${CATCH_GOAL}`;
+    catchHud.classList.toggle("done", caught >= CATCH_GOAL);
+    const dots = catchDots.children;
+    for(let i=0;i<dots.length;i++){
+      dots[i].classList.toggle("on", i < caught);
+    }
+  }
+  updateHud();
+
+  function unlockScroll(){
+    scrollEl.classList.remove("locked");
+    openBtn.setAttribute("aria-label","Abrir el pergamino");
+    if(scrollHintEl) scrollHintEl.textContent = "Toca el pergamino para abrirlo";
+    setTimeout(()=>{ catchHud.classList.add("hide"); }, 1400);
+  }
+
+  catchTargets.forEach((wrap)=>{
+    const flowerG = wrap.querySelector(".flower");
+    flowerG.classList.add("catchable");
+    wrap.style.cursor = "pointer";
+    wrap.addEventListener("click", function onCatch(e){
+      if(flowerG.classList.contains("caught")) return;
+      flowerG.classList.add("caught");
+      sparkleAt(wrap);
+      showFlowerMessage(wrap);
+      flowerG.classList.add("catch-pop");
+      caught = Math.min(CATCH_GOAL, caught+1);
+      updateHud();
+      wrap.removeEventListener("click", onCatch);
+      if(caught >= CATCH_GOAL){
+        unlockScroll();
+      }
+    });
+  });
+
+  /* ---------------- sequential messages on any flower selection ---------------- */
+  const FLOWER_MESSAGES = ["Especial","Makanaky","Gil","Colitas","Me gustas..."];
+  let messageIndex = 0;
+  function showFlowerMessage(wrap){
+    const text = FLOWER_MESSAGES[messageIndex % FLOWER_MESSAGES.length];
+    messageIndex++;
+    const rect = wrap.getBoundingClientRect();
+    const el = document.createElement("div");
+    el.className = "flower-msg";
+    el.textContent = text;
+    el.style.left = (rect.left + rect.width/2 + window.scrollX) + "px";
+    el.style.top = (rect.top + window.scrollY) + "px";
+    el.style.transform = "translate(-50%,0) scale(.7)";
+    document.body.appendChild(el);
+    if(el.animate){
+      const anim = el.animate([
+        {transform:"translate(-50%,0) scale(.7)", opacity:0},
+        {transform:"translate(-50%,-16px) scale(1)", opacity:1, offset:.18},
+        {transform:"translate(-50%,-78px) scale(1)", opacity:0}
+      ],{duration:1900, easing:"cubic-bezier(.2,.7,.25,1)", fill:"forwards"});
+      anim.onfinish = ()=>el.remove();
+    } else {
+      setTimeout(()=>el.remove(), 1900);
+    }
+  }
+
+  /* ---------------- pollen on yellow flowers ---------------- */
+  function pollenBurst(wrap){
+    const rect = wrap.getBoundingClientRect();
+    const holder = document.createElement("div");
+    holder.className = "pollen-puff";
+    holder.style.left = (rect.left + rect.width/2 + window.scrollX) + "px";
+    holder.style.top = (rect.top + rect.height*0.16 + window.scrollY) + "px";
+    document.body.appendChild(holder);
+    const count = Math.round(rand(26,38));
+    for(let i=0;i<count;i++){
+      const s = document.createElement("span");
+      holder.appendChild(s);
+      const ang = rand(-Math.PI, 0); // drifts up and outward, wide spread
+      const dist = rand(70,170);
+      const dx = Math.cos(ang)*dist;
+      const dy = Math.sin(ang)*dist - rand(10,30);
+      const dur = rand(1000,1800);
+      const scale = rand(0.6,1.5);
+      if(s.animate){
+        s.animate([
+          {transform:"translate(0,0) scale(.4)", opacity:0},
+          {opacity:.95, offset:.16},
+          {transform:`translate(${dx}px,${dy}px) scale(${scale})`, opacity:0}
+        ],{duration:dur, easing:"cubic-bezier(.15,.6,.3,1)", delay:rand(0,180), fill:"forwards"});
+      }
+    }
+    setTimeout(()=>holder.remove(), 2100);
+  }
+
+  yellowFlowerWraps.forEach((wrap)=>{
+    const flowerG = wrap.querySelector(".flower");
+    wrap.style.cursor = "pointer";
+    wrap.addEventListener("click", ()=>{
+      pollenBurst(wrap);
+      showFlowerMessage(wrap);
+      flowerG.classList.remove("pollen-shake");
+      void flowerG.offsetWidth; // restart animation if clicked again quickly
+      flowerG.classList.add("pollen-shake");
+    });
+  });
+
+  // Background blue flowers (the ones "de atrás") are now selectable too:
+  // tapping them also releases pollen and shows the next message, without
+  // affecting the atrapa-3-flores-azules progress.
+  blueFlowerWraps.forEach((wrap)=>{
+    const flowerG = wrap.querySelector(".flower");
+    wrap.style.cursor = "pointer";
+    wrap.addEventListener("click", ()=>{
+      pollenBurst(wrap);
+      showFlowerMessage(wrap);
+      flowerG.classList.remove("pollen-shake");
+      void flowerG.offsetWidth;
+      flowerG.classList.add("pollen-shake");
+    });
+  });
 
   const meadowWrap = document.getElementById("meadowWrap");
   backLayer.style.transition = "transform .3s ease-out";
@@ -1044,7 +1285,7 @@
   /* ---------------- música de fondo ---------------- */
   const music = document.getElementById("bgMusic");
   const musicBtn = document.getElementById("musicBtn");
-  music.volume = 0.6;   // volumen de 0 (mudo) a 1 (máximo)
+  music.volume = 0.6;
 
   function syncMusicBtn(){
     musicBtn.textContent = music.paused ? "Poner música" : "Pausar música";
@@ -1061,22 +1302,19 @@
     else{ music.pause(); }
   });
 
-  /* Los navegadores bloquean el audio automático hasta que la persona
-     interactúa con la página. Se intenta reproducir al abrir; si lo
-     bloquean, arranca en el primer toque, clic o tecla. */
   const unlockEvents = ["click","touchend","keydown"];
   function removeUnlock(){
     unlockEvents.forEach(t=>document.removeEventListener(t, unlockMusic, true));
   }
   function unlockMusic(e){
-    if(e.target && e.target.closest && e.target.closest("#musicBtn")) return; // ese botón se encarga solo
+    if(e.target && e.target.closest && e.target.closest("#musicBtn")) return;
     music.play().then(removeUnlock).catch(()=>{});
   }
   unlockEvents.forEach(t=>document.addEventListener(t, unlockMusic, true));
   music.addEventListener("play", removeUnlock);
 
   const firstTry = music.play();
-  if(firstTry && firstTry.catch){ firstTry.catch(()=>{ /* bloqueado: esperará al primer toque */ }); }
+  if(firstTry && firstTry.catch){ firstTry.catch(()=>{}); }
   syncMusicBtn();
 
   /* ---------------- pergamino ---------------- */
@@ -1088,7 +1326,6 @@
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let scrollOpen = false, scrollTimer = null, settleTimer = null, burstTimer = null;
 
-  /* pétalos amarillos y azules que salen del pergamino al abrirse */
   function petalBurst(){
     if(reduceMotion.matches || !burstBox.animate) return;
     const colors = ["#ffce3d","#f2a51c","#ffe27a","#ffce3d","#3e6fbb","#8fb3e8"];
@@ -1096,10 +1333,10 @@
       const p = document.createElement("span");
       p.style.background = colors[Math.floor(Math.random()*colors.length)];
       burstBox.appendChild(p);
-      const ang  = rand(-Math.PI*0.95, -Math.PI*0.05);          // hacia arriba y a los lados
+      const ang  = rand(-Math.PI*0.95, -Math.PI*0.05);
       const dist = rand(120, 330);
       const dx = Math.cos(ang)*dist*1.15;
-      const dy = Math.sin(ang)*dist*0.85 + rand(20,120);         // luego caen un poco
+      const dy = Math.sin(ang)*dist*0.85 + rand(20,120);
       const rot = rand(-260,260);
       const dur = rand(1800,3000);
       const anim = p.animate([
@@ -1111,8 +1348,6 @@
     }
   }
 
-  /* mide el papel para que se desenrolle exactamente hasta su alto natural
-     (o hasta donde quepa en pantalla; si el mensaje es más largo, se desliza dentro) */
   const paperEl = scrollEl.querySelector(".paper");
   function sizePaper(){
     const rollH = scrollEl.querySelector(".roll").offsetHeight;
@@ -1123,7 +1358,7 @@
   window.addEventListener("resize", ()=>{ if(scrollOpen) sizePaper(); });
 
   function openScroll(){
-    if(scrollOpen) return;
+    if(scrollOpen || caught < CATCH_GOAL) return;
     scrollOpen = true;
     sizePaper();
     clearTimeout(scrollTimer); clearTimeout(settleTimer); clearTimeout(burstTimer);
@@ -1132,7 +1367,7 @@
     openBtn.setAttribute("aria-expanded","true");
     openBtn.setAttribute("aria-label","Enrollar el pergamino");
     burstTimer  = setTimeout(petalBurst, 500);
-    settleTimer = setTimeout(()=>{ sizePaper(); scrollEl.classList.add("settled"); }, 1800);   // ya se puede hacer scroll dentro del papel si es largo
+    settleTimer = setTimeout(()=>{ sizePaper(); scrollEl.classList.add("settled"); }, 1800);
   }
 
   function closeScroll(){
@@ -1142,12 +1377,10 @@
     scrollEl.classList.remove("open","settled");
     meadowWrap.classList.remove("scroll-open");
     openBtn.setAttribute("aria-expanded","false");
-    openBtn.setAttribute("aria-label","Abrir el pergamino");
-    clip.scrollTop = 0;   // al volver a abrirlo, el mensaje empieza desde arriba
+    openBtn.setAttribute("aria-label", caught>=CATCH_GOAL ? "Abrir el pergamino" : "Atrapa 3 flores azules del pasto para abrir el pergamino");
+    clip.scrollTop = 0;
   }
 
-  /* ---- distinguir un TOQUE de un gesto de DESLIZAR ----
-     Si el dedo (o el mouse) se movió más de 8px, no cuenta como clic. */
   let downX = 0, downY = 0, moved = false, lastPointerType = "mouse";
   scrollEl.addEventListener("pointerdown", (e)=>{
     downX = e.clientX; downY = e.clientY; moved = false;
@@ -1157,28 +1390,18 @@
     if(Math.abs(e.clientX - downX) > 8 || Math.abs(e.clientY - downY) > 8) moved = true;
   });
 
-  /* tocar el pergamino lo abre / lo enrolla.
-     - Con mouse: tocar los rollos o el papel lo enrolla (como antes).
-     - En pantallas táctiles: el papel NO se cierra al tocarlo (para poder
-       leer y deslizar tranquila); solo se enrolla tocando los rollos
-       o el fondo oscuro. */
   scrollEl.addEventListener("click", (e)=>{
     if(!scrollOpen){ openScroll(); return; }
-    if(moved) return;                                                      // fue un deslizamiento, no un toque
+    if(moved) return;
     const sel = window.getSelection && window.getSelection().toString();
-    if(sel) return;                                                        // si está seleccionando texto para copiarlo, no cerrar
-    if(e.target.classList.contains("paper-clip") && e.offsetX > e.target.clientWidth) return;   // barra de desplazamiento
-    if(lastPointerType !== "mouse" && e.target.closest && e.target.closest(".paper-wrap")) return;   // táctil: tocar el papel no cierra
+    if(sel) return;
+    if(e.target.classList.contains("paper-clip") && e.offsetX > e.target.clientWidth) return;
+    if(lastPointerType !== "mouse" && e.target.closest && e.target.closest(".paper-wrap")) return;
     closeScroll();
   });
-  dim.addEventListener("click", closeScroll);                       // tocar fuera del papel también lo enrolla
+  dim.addEventListener("click", closeScroll);
   document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeScroll(); });
 
-  /* ---- scroll táctil de respaldo ----
-     Normalmente el navegador desliza el papel solo. Pero si en algún
-     celular/tablet el dedo se mueve y el papel NO se desplaza, esto toma
-     el control y mueve el scroll a mano (con un poco de inercia). Si el
-     scroll nativo funciona, este código no interviene. */
   let tStartY = 0, tStartTop = 0, tLastY = 0, tLastT = 0, tVel = 0;
   let tDragging = false, tManual = false, tChecking = false, tRaf = 0;
 
@@ -1195,11 +1418,10 @@
     const y  = e.touches[0].clientY;
     const dy = tStartY - y;
     const dt = e.timeStamp - tLastT;
-    if(dt > 0) tVel = (tLastY - y) / dt;                    // px por ms
+    if(dt > 0) tVel = (tLastY - y) / dt;
     tLastY = y; tLastT = e.timeStamp;
 
     if(!tManual){
-      /* ¿el navegador está desplazando? Si tras 2 frames el scroll no se movió, lo hacemos nosotros */
       if(Math.abs(dy) > 10 && !tChecking){
         tChecking = true;
         requestAnimationFrame(()=>requestAnimationFrame(()=>{

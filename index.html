@@ -1041,12 +1041,12 @@
   const yellowFlowerWraps = []; // yellow flowers - release pollen when tapped
 
   for(let i=0;i<16;i++){
-    const isBlue = Math.random()<0.30;
+    const isBlue = Math.random()<0.5;
     const wrap = placeFlower(backLayer, rand(0,100), rand(-2,10), rand(0.45,0.65), isBlue?"blue":"yellow");
     if(isBlue) blueFlowerWraps.push(wrap); else yellowFlowerWraps.push(wrap);
   }
   for(let i=0;i<11;i++){
-    const isBlue = Math.random()<0.34;
+    const isBlue = Math.random()<0.55;
     const wrap = placeFlower(frontLayer, rand(2,98), rand(-4,4), rand(0.8,1.15), isBlue?"blue":"yellow");
     if(isBlue) grassBlueFlowerWraps.push(wrap); else yellowFlowerWraps.push(wrap);
   }

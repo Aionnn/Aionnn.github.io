@@ -861,12 +861,7 @@
     <span class="dots" id="catchDots"></span>
   </div>
 
-  <div class="ambient-toggles">
-    <button class="soft-btn" id="windBtn" type="button" aria-pressed="false">Calmar el viento</button>
-    <button class="soft-btn" id="nightBtn" type="button" aria-pressed="true">Amanecer</button>
-    <button class="soft-btn" id="musicBtn" type="button">Poner música</button>
-  </div>
-
+  
   <div class="field" id="mainField">
     <svg class="hill back" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">
       <path d="M0,26 Q20,14 42,22 T100,18 V40 H0 Z"/>
@@ -1265,49 +1260,19 @@
     starsSvg.appendChild(c);
   }
 
-  /* ambient toggles */
-  const windBtn = document.getElementById("windBtn");
-  const nightBtn = document.getElementById("nightBtn");
-  let windStill = false, isNight = true;
-  windBtn.addEventListener("click", ()=>{
-    windStill = !windStill;
-    document.body.classList.toggle("still", windStill);
-    windBtn.textContent = windStill ? "Reanudar el viento" : "Calmar el viento";
-    windBtn.setAttribute("aria-pressed", String(windStill));
-  });
-  nightBtn.addEventListener("click", ()=>{
-    isNight = !isNight;
-    document.body.classList.toggle("night", isNight);
-    nightBtn.textContent = isNight ? "Amanecer" : "Anochecer";
-    nightBtn.setAttribute("aria-pressed", String(isNight));
-  });
-
   /* ---------------- música de fondo ---------------- */
   const music = document.getElementById("bgMusic");
-  const musicBtn = document.getElementById("musicBtn");
   music.volume = 0.6;
 
-  function syncMusicBtn(){
-    musicBtn.textContent = music.paused ? "Poner música" : "Pausar música";
-  }
-  music.addEventListener("play", syncMusicBtn);
-  music.addEventListener("pause", syncMusicBtn);
   music.addEventListener("error", ()=>{
     console.warn("No se pudo cargar la música. Revisa que el archivo 'musica.mp3' esté en la misma carpeta que este HTML.");
-    musicBtn.hidden = true;
-  });
-
-  musicBtn.addEventListener("click", ()=>{
-    if(music.paused){ music.play().catch(()=>{}); }
-    else{ music.pause(); }
   });
 
   const unlockEvents = ["click","touchend","keydown"];
   function removeUnlock(){
     unlockEvents.forEach(t=>document.removeEventListener(t, unlockMusic, true));
   }
-  function unlockMusic(e){
-    if(e.target && e.target.closest && e.target.closest("#musicBtn")) return;
+  function unlockMusic(){
     music.play().then(removeUnlock).catch(()=>{});
   }
   unlockEvents.forEach(t=>document.addEventListener(t, unlockMusic, true));
@@ -1315,7 +1280,6 @@
 
   const firstTry = music.play();
   if(firstTry && firstTry.catch){ firstTry.catch(()=>{}); }
-  syncMusicBtn();
 
   /* ---------------- pergamino ---------------- */
   const scrollEl = document.getElementById("scroll");

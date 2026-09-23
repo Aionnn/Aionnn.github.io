@@ -235,7 +235,7 @@
   @keyframes drift{0%{transform:translate(0,0);}50%{transform:translate(14px,-22px);}100%{transform:translate(0,0);}}
   @keyframes glow{0%,100%{opacity:.25;}50%{opacity:1;}}
 
-  /* ---------- CATCH-THE-BLUE-FLOWERS GAME ---------- */
+  /* ---------- CATCH-THE-FLOWERS GAME ---------- */
   .catch-hud{
     position:absolute;
     top:calc(env(safe-area-inset-top,0px) + 14px);
@@ -291,9 +291,9 @@
     text-shadow:0 2px 10px rgba(0,0,0,.55), 0 0 16px rgba(255,206,61,.55);
     white-space:nowrap;
   }
-  .flower.blue-bloom.catchable:hover{filter:brightness(1.18);}
-  .flower.blue-bloom.caught{pointer-events:none;}
-  .flower.blue-bloom.catch-pop{animation:catchPop .55s cubic-bezier(.3,1.6,.4,1) forwards;}
+  .flower.catchable:hover{filter:brightness(1.18);}
+  .flower.caught{pointer-events:none;}
+  .flower.catch-pop{animation:catchPop .55s cubic-bezier(.3,1.6,.4,1) forwards;}
   @keyframes catchPop{
     0%{transform:scale(1);opacity:1;}
     45%{transform:scale(1.35);opacity:1;}
@@ -853,11 +853,11 @@
   <div class="hero-copy">
     <p class="for"></p>
     <h1>Un campo de flores</h1>
-    <p>Amarillas y algunas azules porque se que son las que te gustan. Atrapa las 3 flores azules del pasto para desbloquear el pergamino.</p>
+    <p>Amarillas y algunas azules porque se que son las que te gustan. Atrapa 5 flores del pasto (del color que quieras) para desbloquear el pergamino.</p>
   </div>
 
   <div class="catch-hud" id="catchHud">
-    <span id="catchLabel">Atrapa las flores azules del pasto: 0/3</span>
+    <span id="catchLabel">Atrapa 5 flores del pasto: 0/5</span>
     <span class="dots" id="catchDots"></span>
   </div>
 
@@ -884,7 +884,7 @@
       <div class="scroll locked" id="scroll">
         <button class="scroll-hit" id="scrollOpen" type="button"
                 aria-expanded="false" aria-controls="scrollMessage"
-                aria-label="Atrapa 3 flores azules del pasto para abrir el pergamino"></button>
+                aria-label="Atrapa 5 flores del pasto para abrir el pergamino"></button>
 
         <div class="roll roll-top" aria-hidden="true"></div>
 
@@ -973,7 +973,7 @@
       </div>
 
       <div class="scroll-foot">
-        <p class="scroll-hint" id="scrollHint">Atrapa las 3 flores azules del pasto para abrir el pergamino</p>
+        <p class="scroll-hint" id="scrollHint">Atrapa las 5 flores del pasto para abrir el pergamino</p>
       </div>
 
       <div class="petal-burst" id="petalBurst" aria-hidden="true"></div>
@@ -1034,7 +1034,7 @@
   const mainField = document.getElementById("mainField");
 
   // On phones (touch, narrower screens) the fingertip is much less precise
-  // than a mouse pointer, so blue flowers get extra size and a much more
+  // than a mouse pointer, so flowers get extra size and a much more
   // generous tap radius.
   const isTouchDevice = (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) || window.innerWidth <= 480;
 
@@ -1044,7 +1044,7 @@
   // happened to catch the click — this is what was failing when flowers
   // were close together.
   const interactiveFlowers = [];
-  const grassBlueEntries = [];
+  const grassEntries = []; // any flower planted in the front (grass) layer, any color
 
   for(let i=0;i<16;i++){
     const isBlue = Math.random()<0.5;
@@ -1054,16 +1054,16 @@
   }
   for(let i=0;i<11;i++){
     const isBlue = Math.random()<0.55;
-    const scale = isBlue && isTouchDevice ? rand(1.0,1.35) : rand(0.8,1.15);
+    const scale = isTouchDevice ? rand(1.0,1.35) : rand(0.8,1.15);
     const wrap = placeFlower(frontLayer, rand(2,98), rand(-4,4), scale, isBlue?"blue":"yellow");
     wrap.style.pointerEvents = "none";
     const entry = {wrap, flowerG: wrap.querySelector(".flower"), isBlue, isCatchTarget:false, caught:false};
     interactiveFlowers.push(entry);
-    if(isBlue) grassBlueEntries.push(entry);
+    grassEntries.push(entry);
   }
 
-  /* ---------------- catch-the-blue-flowers game ---------------- */
-  const CATCH_GOAL = 3;
+  /* ---------------- catch-the-flowers game ---------------- */
+  const CATCH_GOAL = 5;
   const catchHud = document.getElementById("catchHud");
   const catchLabel = document.getElementById("catchLabel");
   const catchDots = document.getElementById("catchDots");
@@ -1078,24 +1078,24 @@
   }
 
   // Only flowers in the grass (foreground layer) can be part of the
-  // unlock game. If there aren't enough blue ones there yet, plant a few
-  // more so the game can always be completed.
-  while(grassBlueEntries.length < CATCH_GOAL){
+  // unlock game. If there aren't enough there yet, plant a few more so
+  // the game can always be completed.
+  while(grassEntries.length < CATCH_GOAL){
+    const isBlue = Math.random()<0.55;
     const scale = isTouchDevice ? rand(1.0,1.35) : rand(0.85,1.15);
-    const wrap = placeFlower(frontLayer, rand(2,98), rand(-4,4), scale, "blue");
+    const wrap = placeFlower(frontLayer, rand(2,98), rand(-4,4), scale, isBlue?"blue":"yellow");
     wrap.style.pointerEvents = "none";
-    const entry = {wrap, flowerG: wrap.querySelector(".flower"), isBlue:true, isCatchTarget:false, caught:false};
+    const entry = {wrap, flowerG: wrap.querySelector(".flower"), isBlue, isCatchTarget:false, caught:false};
     interactiveFlowers.push(entry);
-    grassBlueEntries.push(entry);
+    grassEntries.push(entry);
   }
 
-  // Pick exactly CATCH_GOAL blue grass flowers to be the "catchable" ones
-  // that unlock the scroll. Any other blue flowers (extra ones in the
-  // grass, or any in the back) are still selectable — they just release
-  // pollen and show a message like the yellow ones do.
-  const shuffled = grassBlueEntries.slice().sort(()=>Math.random()-0.5);
-  const catchTargets = shuffled.slice(0, CATCH_GOAL);
-  catchTargets.forEach((entry)=>{
+  // EVERY grass flower — any color — is catch-eligible now. The first
+  // CATCH_GOAL distinct ones the person selects (in any order, any color)
+  // complete the goal and unlock the scroll. Any flower clicked after
+  // that (or any back-layer flower) still reacts, it just no longer
+  // counts toward the tally.
+  grassEntries.forEach((entry)=>{
     entry.isCatchTarget = true;
     entry.flowerG.classList.add("catchable");
   });
@@ -1127,7 +1127,7 @@
   function updateHud(){
     catchLabel.textContent = caught >= CATCH_GOAL
       ? "¡Pergamino desbloqueado! 💛"
-      : `Atrapa las flores azules: ${caught}/${CATCH_GOAL}`;
+      : `Atrapa 5 flores del pasto: ${caught}/${CATCH_GOAL}`;
     catchHud.classList.toggle("done", caught >= CATCH_GOAL);
     const dots = catchDots.children;
     for(let i=0;i<dots.length;i++){
@@ -1169,7 +1169,7 @@
     }
   }
 
-  /* ---------------- pollen burst (yellow flowers, and any non-target blue flower) ---------------- */
+  /* ---------------- pollen burst (any flower that isn't a catch target) ---------------- */
   function pollenBurst(wrap){
     const rect = wrap.getBoundingClientRect();
     const holder = document.createElement("div");
@@ -1199,8 +1199,7 @@
   }
 
   function selectFlower(entry){
-    if(entry.isCatchTarget){
-      if(entry.caught) return;
+    if(entry.isCatchTarget && !entry.caught && caught < CATCH_GOAL){
       entry.caught = true;
       entry.flowerG.classList.add("caught");
       sparkleAt(entry.wrap);
@@ -1218,8 +1217,10 @@
     entry.flowerG.classList.add("pollen-shake");
   }
 
-  // On phones (touch, narrower screens) the fingertip is much less precise
-  // than a mouse pointer, so blue flowers get an extra-generous tap radius.
+  // No hit-radius cap at all: any click/tap inside the field always
+  // resolves to whichever flower is nearest, however far it sits from the
+  // exact pixel tapped. This makes every flower easy to select, not just
+  // the ones directly under the cursor/finger.
   function findNearestFlower(clientX, clientY){
     let best = null, bestDist = Infinity;
     for(const entry of interactiveFlowers){
@@ -1230,12 +1231,7 @@
       const cy = rect.top + rect.height*0.34; // roughly where the bloom sits
       const dx = clientX - cx, dy = clientY - cy;
       const dist = Math.sqrt(dx*dx + dy*dy);
-      let radiusFactor = isTouchDevice ? 1.15 : 0.62;
-      if(entry.isBlue) radiusFactor = isTouchDevice ? 1.6 : 0.85;
-      // On touch devices there's no upper limit: any tap inside the field
-      // always resolves to the nearest flower, even near the screen edge.
-      const radius = isTouchDevice ? Infinity : Math.max(rect.width, rect.height) * radiusFactor;
-      if(dist <= radius && dist < bestDist){
+      if(dist < bestDist){
         bestDist = dist;
         best = entry;
       }
@@ -1367,7 +1363,7 @@
     scrollEl.classList.remove("open","settled");
     meadowWrap.classList.remove("scroll-open");
     openBtn.setAttribute("aria-expanded","false");
-    openBtn.setAttribute("aria-label", caught>=CATCH_GOAL ? "Abrir el pergamino" : "Atrapa 3 flores azules del pasto para abrir el pergamino");
+    openBtn.setAttribute("aria-label", caught>=CATCH_GOAL ? "Abrir el pergamino" : "Atrapa 5 flores del pasto para abrir el pergamino");
     clip.scrollTop = 0;
   }
 

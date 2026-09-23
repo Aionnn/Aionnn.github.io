@@ -1033,6 +1033,11 @@
   const frontLayer = document.getElementById("frontLayer");
   const mainField = document.getElementById("mainField");
 
+  // On phones (touch, narrower screens) the fingertip is much less precise
+  // than a mouse pointer, so blue flowers get extra size and a much more
+  // generous tap radius.
+  const isTouchDevice = (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) || window.innerWidth <= 480;
+
   // Every flower (yellow or blue, front or back) is tracked here so it can
   // be selected. Selection is resolved by finding the flower whose center
   // is CLOSEST to the tap, instead of relying on which overlapping SVG
@@ -1049,7 +1054,8 @@
   }
   for(let i=0;i<11;i++){
     const isBlue = Math.random()<0.55;
-    const wrap = placeFlower(frontLayer, rand(2,98), rand(-4,4), rand(0.8,1.15), isBlue?"blue":"yellow");
+    const scale = isBlue && isTouchDevice ? rand(1.0,1.35) : rand(0.8,1.15);
+    const wrap = placeFlower(frontLayer, rand(2,98), rand(-4,4), scale, isBlue?"blue":"yellow");
     wrap.style.pointerEvents = "none";
     const entry = {wrap, flowerG: wrap.querySelector(".flower"), isBlue, isCatchTarget:false, caught:false};
     interactiveFlowers.push(entry);
@@ -1075,7 +1081,8 @@
   // unlock game. If there aren't enough blue ones there yet, plant a few
   // more so the game can always be completed.
   while(grassBlueEntries.length < CATCH_GOAL){
-    const wrap = placeFlower(frontLayer, rand(2,98), rand(-4,4), rand(0.85,1.15), "blue");
+    const scale = isTouchDevice ? rand(1.0,1.35) : rand(0.85,1.15);
+    const wrap = placeFlower(frontLayer, rand(2,98), rand(-4,4), scale, "blue");
     wrap.style.pointerEvents = "none";
     const entry = {wrap, flowerG: wrap.querySelector(".flower"), isBlue:true, isCatchTarget:false, caught:false};
     interactiveFlowers.push(entry);
@@ -1211,8 +1218,8 @@
     entry.flowerG.classList.add("pollen-shake");
   }
 
-  // Resolve a tap/click to the nearest still-active flower, rather than
-  // trusting SVG hit-testing (which breaks down when flowers overlap).
+  // On phones (touch, narrower screens) the fingertip is much less precise
+  // than a mouse pointer, so blue flowers get an extra-generous tap radius.
   function findNearestFlower(clientX, clientY){
     let best = null, bestDist = Infinity;
     for(const entry of interactiveFlowers){
@@ -1223,7 +1230,11 @@
       const cy = rect.top + rect.height*0.34; // roughly where the bloom sits
       const dx = clientX - cx, dy = clientY - cy;
       const dist = Math.sqrt(dx*dx + dy*dy);
-      const radius = Math.max(rect.width, rect.height) * 0.62;
+      let radiusFactor = isTouchDevice ? 1.15 : 0.62;
+      if(entry.isBlue) radiusFactor = isTouchDevice ? 1.6 : 0.85;
+      // On touch devices there's no upper limit: any tap inside the field
+      // always resolves to the nearest flower, even near the screen edge.
+      const radius = isTouchDevice ? Infinity : Math.max(rect.width, rect.height) * radiusFactor;
       if(dist <= radius && dist < bestDist){
         bestDist = dist;
         best = entry;

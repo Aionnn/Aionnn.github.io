@@ -109,6 +109,9 @@
   .stars{position:absolute;inset:0;opacity:0;transition:opacity 1s ease;}
   body.night .stars{opacity:1;}
   .stars circle{fill:#fff;}
+  .stars circle.twinkle{animation:twinkle 3s ease-in-out infinite;}
+  @keyframes twinkle{0%,100%{opacity:.25;}50%{opacity:1;}}
+  .stars circle.burst-star{fill:#fff8e0;}
 
   .clouds{position:absolute;inset:0;}
   .cloud{
@@ -1296,22 +1299,27 @@
   const starsSvg = document.querySelector(".stars");
   for(let i=0;i<60;i++){
     const c = document.createElementNS(ns,"circle");
+    c.setAttribute("class","twinkle");
     c.setAttribute("cx", rand(0,100));
     c.setAttribute("cy", rand(0,55));
     c.setAttribute("r", rand(0.15,0.55));
-    c.style.opacity = rand(0.3,1);
+    c.style.animationDuration = rand(2.2,5).toFixed(2)+"s";
+    c.style.animationDelay = "-"+rand(0,5).toFixed(2)+"s";
     starsSvg.appendChild(c);
   }
 
+  /* ---------------- luna: mensajes bonitos ---------------- */
   const moonEl = document.getElementById("moon");
   const MOON_MESSAGES = [
-    "Me gustas",
     "Ojos caramelo",
     "Makanaky",
     "Me importas",
     "YO CONFIO EN TI",
     "Solo se TU",
     "Estoy para TI",
+    "Me gustas mucho",
+    "Mereces cosas bonitas",
+    "Pienso en ti",
   ];
   let moonMsgIndex = Math.floor(rand(0, MOON_MESSAGES.length));
 
@@ -1362,9 +1370,36 @@
     }
   }
 
+  function spawnExtraStars(count){
+    if(reduceMotion.matches) return;
+    for(let i=0;i<count;i++){
+      const c = document.createElementNS(ns,"circle");
+      c.setAttribute("class","burst-star");
+      c.setAttribute("cx", rand(2,98));
+      c.setAttribute("cy", rand(0,55));
+      c.setAttribute("r", rand(0.35,0.9));
+      c.style.opacity = "0";
+      starsSvg.appendChild(c);
+      if(c.animate){
+        const holdOpacity = rand(0.55,1);
+        const anim = c.animate([
+          {opacity:0, r:0},
+          {opacity:holdOpacity, offset:.25},
+          {opacity:holdOpacity*0.5, offset:.6},
+          {opacity:holdOpacity, offset:.8},
+          {opacity:0}
+        ],{duration:rand(2600,4200), delay:rand(0,500), easing:"ease-in-out", fill:"forwards"});
+        anim.onfinish = ()=>c.remove();
+      } else {
+        setTimeout(()=>c.remove(), 3500);
+      }
+    }
+  }
+
   function touchMoon(){
     moonSparkle(moonEl);
     showMoonMessage(moonEl);
+    spawnExtraStars(Math.round(rand(10,16)));
     moonEl.classList.remove("moon-pulse");
     void moonEl.offsetWidth; // restart animation on repeated taps
     moonEl.classList.add("moon-pulse");
@@ -1378,6 +1413,12 @@
         touchMoon();
       }
     });
+  }
+
+  // Ambient stars: a few new ones keep drifting into the sky on their own,
+  // independent of touching the moon, so the night sky never sits still.
+  if(!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)){
+    setInterval(()=>{ spawnExtraStars(Math.round(rand(2,4))); }, 4200);
   }
 
   /* ---------------- música de fondo ---------------- */
